@@ -20,7 +20,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('llave')
+SECRET_KEY = 'django-insecure-w+wdkgexood@jt1pu$%yz>'
+    #os.environ.get('llave')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -37,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'admincred.apps.AdmincredConfig'
 ]
 
 MIDDLEWARE = [
@@ -81,7 +83,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'cuentas',
         'USER': 'admin',
-        'PASSWORD': os.environ.get('pwdbd'),
+        'PASSWORD': 'z49lhCLP6STJgNBy',
+        # os.environ.get('pwdbd'),
         'HOST': '127.0.0.1',
         'PORT': '3306',
     }

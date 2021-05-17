@@ -8,6 +8,7 @@ for linea in $(ccdecrypt -c "$1"); do
 done
 
 #Menú
+
 python3 manage.py migrate
 python3 manage.py makemigration
 python3 manage.py runserver
