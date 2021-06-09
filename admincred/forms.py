@@ -1,11 +1,14 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
+from .models import *
 
-from .models import Perfil
 
-class SignUpForm(UserCreationForm):
-    first_name = forms.CharField(max_length=20, requiered=True)
+class ProfileForm(UserCreationForm):
+
+    password1 = forms.CharField(label='Contraseña', widget=forms.PasswordInput)
+    password2 = forms.CharField(label='Confirma contraseña', widget=forms.PasswordInput)
+    first_name = forms.CharField(max_length=20, required=True)
     last_name = forms.CharField(max_length=35, required=True)
     email = forms.EmailField(required=True)
 
@@ -18,10 +21,25 @@ class SignUpForm(UserCreationForm):
             'last_name',
             'password1',
             'password2',
+
         )
-        model = Perfil
+        help_texts = {k: "" for k in fields} # ayuda a quitar los mensajes de ayuda
+
+
+class DataProfileForm(forms.ModelForm):
+
+    class Meta:
+        model = Profile
         fields = (
-            'celular',
+            'token',
+            'chat_id',
         )
 
 
+class LoginForm(AuthenticationForm):
+    def __init__(self, *args, **kwargs):  # es el metodo que ejecuta toda clase de python lo redifinimos
+        super(LoginForm, self).__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs['class'] = 'form-control'
+        self.fields['username'].widget.attrs['placeholder'] = 'Nombre de usuario'
+        self.fields['password'].widget.attrs['class'] = 'form-control'
+        self.fields['password'].widget.attrs['placeholder'] = 'Contraseña'

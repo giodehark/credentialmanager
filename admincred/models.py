@@ -3,8 +3,10 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 # Create your models here.
 #prueba
-
-class Perfil(models.Model):
+class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    celular = models.CharField(max_length=10, blank=False)
-    tokenUser = models.CharField(max_length=8, blank=False)
+    token = models.CharField(max_length=70)
+    chat_id = models.CharField(max_length=15)
+
+    def __str__(self):
+        return self.user.username

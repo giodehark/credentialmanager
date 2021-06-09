@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Registro</title>
-
+    <title>Index</title>
     <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -12,20 +11,12 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
 <body>
-<div class="">
-    <div class="container">
-        <h1 class="text_center"> Perfil</h1>
-        {% if register %}
-        <h1>Registro exitoso</h1>
-        {% else %}
-        <form action="{%  url 'reg' %}" class="form" method="post">
-            {% csrf_token %}
-            {{ profile_form.as_p }}
-            {{ data_form.as_p }}
-            <button class="btn btn-success" type="'submit">Registrar</button>
-        </form>
-        {% endif %}
-    </div>
+
+
+<div class="container">
+    <h1 class="text-center"> Credential Manager</h1>
+    <a class="btn btn-success btn-lg" href="{% url 'reg'%}" >Registro</a>
+
 
 </div>
 
