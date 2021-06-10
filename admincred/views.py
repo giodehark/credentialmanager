@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
+from . import utils
 from .forms import ProfileForm, DataProfileForm, LoginForm
 from .models import Profile
 from .models import User
@@ -8,12 +9,8 @@ from django.contrib.auth import authenticate, login as do_login, logout as do_lo
 
 # Create your views here.
 
-
-
-
 def index(request):
     return render(request, 'index.html')
-
 
 def profile_register(request):
     register = False
@@ -47,7 +44,7 @@ def login(request):
         user = authenticate(request=request, username=nameuser, password=passuser)
         if user is not None:
             valide_user = True
-            SendToken(request, nameuser)
+            #SendToken(nameuser)
             try:
                 do_login(request,
                          user)  # MML guarda el id del usuario en la sesion almacenado en {{ user }} y aqui se accede como request.session.get("user")
@@ -59,19 +56,29 @@ def login(request):
             return render(request, 'login.html',
                           {"form": LoginForm, "errores": "Usuario y/o contraseña inválidos.",
                            "valide_user": valide_user,
-            })
+                           })
 
     elif request.method == "GET":
+        ip = utils.get_client_ip(request)
         return render(request, "login.html",
                       {"form": LoginForm,
                        "valide_user": valide_user,
+                       "ip": ip,
                        })
 
-def SendToken(request, pk, nameuser):
+
+def logout(request):
+    """Se cerrara sesión ademas de que se borraran los datos de la sesión"""
+    request.session.flush()
+    respuesta = redirect('login')
+    return respuesta
+
+def SendToken(nameuser):
     u = User.objects.get(username=nameuser)
+    user=nameuser
     u_id = u.id # este es el id del usuario
     #pe = Profile.objects.all()
-    #token = Profile.objects.get(usr=request.user)
+    #token = Profile.objects.get(user=user.)
     print(u)
     print(u_id)
     #print(token)
