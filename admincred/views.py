@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from . import utils
-from .forms import ProfileForm, DataProfileForm, LoginForm
+from .forms import ProfileForm, DataProfileForm, LoginForm, tokenForm
 from .models import Profile
 from .models import User
 from django.http import HttpResponse
@@ -43,13 +43,17 @@ def login(request):
         passuser = request.POST.get("password")
         user = authenticate(request=request, username=nameuser, password=passuser)
         if user is not None:
-            valide_user = True
-            #SendToken(nameuser)
+            token = utils.generar_token()
+            print(token)
+            profiletoken = Profile.objects.get(user=user.id)
+            profiletoken.token = token
+            print(profiletoken.user.username)
+            profiletoken.save()
+            utils.mandar_mensajebot(token, profiletoken.chat_id)
             try:
-                do_login(request,
-                         user)  # MML guarda el id del usuario en la sesion almacenado en {{ user }} y aqui se accede como request.session.get("user")
+                do_login(request, user)
                 # request.session.set_expiry(settings.EXPIRY_TIME)
-                return redirect('login')
+                return redirect('validar')
             except Exception:
                 return render(request, 'login.html', {"form": LoginForm, "errores": "Error al iniciar sesión"})
         else:
@@ -59,12 +63,25 @@ def login(request):
                            })
 
     elif request.method == "GET":
-        ip = utils.get_client_ip(request)
         return render(request, "login.html",
-                      {"form": LoginForm,
-                       "valide_user": valide_user,
-                       "ip": ip,
-                       })
+                      {"form": LoginForm })
+
+
+def validar_token(request):
+    username = request.user.username
+    tokenform = tokenForm()
+
+    if request.method == 'POST':
+        token = request.POST.get('token')
+        token_bd =Profile.objects.get(token=token)
+        if token_bd.user.username == username:
+            return redirect('index')
+        else:
+            return redirect('validar')
+    else:
+        return render(request, "validar.html",
+                      {"form": tokenForm})
+
 
 
 def logout(request):
