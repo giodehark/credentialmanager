@@ -3,8 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../static/css/style.css">
+    <script src="../static/js/valid.js"></script>
 </head>
 <body>
+<div class="container mt-5">
+    <div class="row d-flex justify-content-center align-items-center">
+        <div class="col-md-8">
+            <form id="regForm" action="{% url 'validar' %}" method="post">
+                {% csrf_token %}
+                <h1 id="register">Autenticación de Token</h1>
+                <div class="all-steps" id="all-steps"> <span class="step"><i class="fa fa-user"></i></span> </div>
+                <div class="tab">
+                    <h6>Ingresa el Token</h6>
+                    <p> {{ form.token }}</p>
+                </div>
+
+
+                <div style="float:right;"> <button type="submit" ><i class="fa fa-angle-double-right"></i></button>  </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+
 
 </body>
 </html>

@@ -31,7 +31,6 @@ class DataProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = (
-            'token',
             'chat_id',
         )
 
@@ -43,3 +42,25 @@ class LoginForm(AuthenticationForm):
         self.fields['username'].widget.attrs['placeholder'] = 'Nombre de usuario'
         self.fields['password'].widget.attrs['class'] = 'form-control'
         self.fields['password'].widget.attrs['placeholder'] = 'Contraseña'
+
+
+
+
+
+
+class tokenForm(forms.ModelForm):
+    class Meta:
+        model = Profile
+        fields = ['token']
+        labels = {
+            'token': 'Ingresar Token: ',
+        }
+        widgets = {
+            'token': forms.PasswordInput(
+                attrs={
+                    'placeholder': 'Ingrese su token',
+                    'name': 'fname',
+                    'id': 'token',
+                }
+            ),
+        }

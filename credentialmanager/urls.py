@@ -19,13 +19,12 @@ from django.urls import include
 from admincred import views
 from django.contrib.auth.views import LoginView, LogoutView
 
-
-
 urlpatterns = [
     path('admin/', admin.site.urls),
-path('', views.index, name='index'),
+    path('', views.index, name='index'),
     path('registro/', views.profile_register, name='reg'),
     path('login/', views.login, name='login'),
     path('logout/', views.logout, name='logout'),
+    path('validar/', views.validar_token, name='validar'),
 
 ]
