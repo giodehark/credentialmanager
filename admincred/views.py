@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect
 from . import utils
 from .forms import ProfileForm, DataProfileForm, LoginForm, tokenForm
 from .models import Profile
+from django.contrib.auth.forms import UserCreationForm
 from .models import User
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login as do_login, logout as do_logout
@@ -20,10 +21,13 @@ def profile_register(request):
         if profile_form.is_valid() and data_form.is_valid():
             user = profile_form.save()
             user.set_password(user.password)
-            user.save()
-            profile = data_form.save(commit=False)
-            profile.user = user
-            profile.save()
+            #print(user.set_password(user.password))
+            #user.save()
+            profile_form.save()
+            datapro = data_form.save(commit=False)
+            datapro.user = user
+            datapro.save()
+            data_form.save(commit=False)
             register = True
         else:
             HttpResponse("<h1> Algo malo sucedio </h1>")
@@ -42,7 +46,9 @@ def login(request):
         nameuser = request.POST.get("username")
         passuser = request.POST.get("password")
         user = authenticate(request=request, username=nameuser, password=passuser)
+        print(user)
         if user is not None:
+            print("encontro al usuario")
             token = utils.generar_token()
             print(token)
             profiletoken = Profile.objects.get(user=user.id)
@@ -51,7 +57,8 @@ def login(request):
             profiletoken.save()
             utils.mandar_mensajebot(token, profiletoken.chat_id)
             try:
-                do_login(request, user)
+                do_login(request,
+                         user)
                 # request.session.set_expiry(settings.EXPIRY_TIME)
                 return redirect('validar')
             except Exception:
@@ -73,7 +80,7 @@ def validar_token(request):
 
     if request.method == 'POST':
         token = request.POST.get('token')
-        token_bd =Profile.objects.get(token=token)
+        token_bd = Profile.objects.get(token=token)
         if token_bd.user.username == username:
             return redirect('index')
         else:
@@ -89,24 +96,3 @@ def logout(request):
     request.session.flush()
     respuesta = redirect('login')
     return respuesta
-
-def SendToken(nameuser):
-    u = User.objects.get(username=nameuser)
-    user=nameuser
-    u_id = u.id # este es el id del usuario
-    #pe = Profile.objects.all()
-    #token = Profile.objects.get(user=user.)
-    print(u)
-    print(u_id)
-    #print(token)
-    #model = User
-    #id_user = User.objects.get(id=pk,username=nameuser)
-
-   # print(id_user)
-    #model =Profile
-    #token=Profile.objects.
-
-
-
-
-

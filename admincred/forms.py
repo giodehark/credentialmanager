@@ -6,8 +6,8 @@ from .models import *
 
 class ProfileForm(UserCreationForm):
 
-    password1 = forms.CharField(label='Contraseña', widget=forms.PasswordInput)
-    password2 = forms.CharField(label='Confirma contraseña', widget=forms.PasswordInput)
+    #password1 = forms.CharField(label='Contraseña', widget=forms.PasswordInput)
+    #password2 = forms.CharField(label='Confirma contraseña', widget=forms.PasswordInput)
     first_name = forms.CharField(max_length=20, required=True)
     last_name = forms.CharField(max_length=35, required=True)
     email = forms.EmailField(required=True)
