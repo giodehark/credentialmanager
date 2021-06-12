@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'admincred.apps.AdmincredConfig'
+    'admincred.apps.AdmincredConfig',
+    'axes',
 ]
 
 MIDDLEWARE = [
@@ -48,6 +49,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'axes.middleware.AxesMiddleware',
 ]
 
 ROOT_URLCONF = 'credentialmanager.urls'
@@ -128,10 +130,27 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 
+
+AUTHENTICATION_BACKENDS = [
+    'axes.backends.AxesBackend',
+
+]
+
+
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
+#sesiones
 SESSION_COOKIE_AGE = 600
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+
+##limite de intentos
+AXES_ENABLED = True
+AXES_FAILURE_LIMIT = 2
+AXES_LOCK_OUT_AT_FAILURE = 5
+AXES_LOCK_OUT_BY_USER_OR_IP = True
+AXES_LOCKOUT_URL = 'bloqueo'
+AXES_LOCKOUT_TEMPLATE = 'bloqueo.html'
