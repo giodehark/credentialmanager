@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import os
 from pathlib import Path
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -26,7 +27,7 @@ SECRET_KEY = 'django-insecure-w+wdkgexood@jt1pu$%yz>'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -132,13 +133,6 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 
 
-AUTHENTICATION_BACKENDS = [
-    'axes.backends.AxesBackend',
-
-]
-
-
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
@@ -150,8 +144,13 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 ##limite de intentos
 AXES_ENABLED = True
-AXES_FAILURE_LIMIT = 2
-AXES_LOCK_OUT_AT_FAILURE = 5
-AXES_LOCK_OUT_BY_USER_OR_IP = True
+AXES_FAILURE_LIMIT = 5
+AXES_LOCK_OUT_BY_COMBINATION_USER_AND_IP = True
+AXES_COOLOFF_TIME = 1
 AXES_LOCKOUT_URL = 'bloqueo'
 AXES_LOCKOUT_TEMPLATE = 'bloqueo.html'
+
+AUTHENTICATION_BACKENDS = (
+    'axes.backends.AxesBackend',
+    'django.contrib.auth.backends.ModelBackend',
+)
