@@ -82,7 +82,7 @@ def validar_token(request):
         token = request.POST.get('token')
         token_bd = Profile.objects.get(token=token)
         if token_bd.user.username == username:
-            return redirect('index')
+            return redirect('menu')
         else:
             return redirect('validar')
     else:
@@ -96,3 +96,17 @@ def logout(request):
     request.session.flush()
     respuesta = redirect('login')
     return respuesta
+
+
+
+def menu(request):
+    '''se tomara al usuario que inicio sesion y se mostraran sus credenciales'''
+    username = request.user.username
+    return render(request, 'menu_user.html', {
+        'username': username,
+    })
+
+
+
+
+
