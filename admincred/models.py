@@ -7,6 +7,7 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     token = models.CharField(max_length=70)
     chat_id = models.CharField(max_length=15)
+    valido = models.BooleanField("valido_token", default=False)
 
 
     def __str__(self):

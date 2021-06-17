@@ -6,8 +6,8 @@ from .models import Profile
 from django.contrib.auth.forms import UserCreationForm
 from .models import User
 from django.http import HttpResponse
-from django.contrib.auth import authenticate, login as do_login, logout as do_logout
-
+from django.contrib.auth import authenticate, login as do_login
+from . import decorators
 # Create your views here.
 
 def index(request):
@@ -15,6 +15,8 @@ def index(request):
 
 def profile_register(request):
     register = False
+    prueba= request.user.id
+    print(prueba)
     if request.method == 'POST':
         profile_form = ProfileForm(data=request.POST)
         data_form = DataProfileForm(data=request.POST)
@@ -82,6 +84,15 @@ def validar_token(request):
         token = request.POST.get('token')
         token_bd = Profile.objects.get(token=token)
         if token_bd.user.username == username:
+            ''' Se toma el id del usuario y en la tabla profile cambia en la columna de valido a true'''
+            id_user = request.user.id
+            valido_bd = Profile.objects.get(user=id_user)
+            print(valido_bd.valido)
+            # se guardara en la bd ahora a true en valido
+            valido_bd.valido = True
+            valido_bd.save()
+            print('inicio ')
+            print(valido_bd.valido)
             return redirect('menu')
         else:
             return redirect('validar')
@@ -93,15 +104,49 @@ def validar_token(request):
 
 def logout(request):
     """Se cerrara sesión ademas de que se borraran los datos de la sesión"""
-    request.session.flush()
-    respuesta = redirect('login')
-    return respuesta
+    id_user = request.user.id
+    if id_user != None:
+        valido_bd = Profile.objects.get(user=id_user)
+        print(valido_bd.valido)
+        ''' se guardara en la bd ahora a false en valido'''
+        valido_bd.valido = False
+        valido_bd.save()
+        print('se cerro sesion cambia a:')
+        print(valido_bd.valido)
+        request.session.flush()
+        respuesta = redirect('login')
+        return respuesta
+    return redirect('login')
 
 
-
+@decorators.token_no_validado
 def menu(request):
     '''se tomara al usuario que inicio sesion y se mostraran sus credenciales'''
+
+    '''falta poner decorador de inicio sesion y si pasa entonces tomamos el id del usuario
+    '''
+
+    ''' en el validar token falta que al autenticar token si esta bien 
+    entonces se procede a cambiar a true la columna valido, asi se procedera 
+    a crear un decorador que podra ser usado en otras vistas '''
     username = request.user.username
+
+    '''
+    id_user =request.user.id
+
+    print(id_user)
+    valido_bd = Profile.objects.get(user=id_user)
+    print(valido_bd.valido)
+    #se guardara en la bd ahora a true en valido
+    valido_bd.valido = True
+    valido_bd.save()
+    print(valido_bd.valido)
+    #profilevalido = Profile.objects.get(user=username.id)
+    #profilevalido.valido = token
+    #print(profilevalido.user.username)
+    #profilevalido.save()
+    '''
+
     return render(request, 'menu_user.html', {
         'username': username,
     })

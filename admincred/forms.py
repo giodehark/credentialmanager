@@ -36,6 +36,8 @@ class DataProfileForm(forms.ModelForm):
 
 
 class LoginForm(AuthenticationForm):
+
+
     def __init__(self, *args, **kwargs):  # es el metodo que ejecuta toda clase de python lo redifinimos
         super(LoginForm, self).__init__(*args, **kwargs)
         self.fields['username'].widget.attrs['class'] = 'form-control'
