@@ -1,3 +1,6 @@
+from threading import Timer
+
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from . import utils
@@ -57,6 +60,8 @@ def login(request):
             profiletoken.token = token
             print(profiletoken.user.username)
             profiletoken.save()
+            h = Timer(30.0, utils.deleteToken,(profiletoken,))
+            h.start()
             utils.mandar_mensajebot(token, profiletoken.chat_id)
             try:
                 do_login(request,
@@ -75,27 +80,33 @@ def login(request):
         return render(request, "login.html",
                       {"form": LoginForm })
 
-
+@login_required
 def validar_token(request):
     username = request.user.username
     tokenform = tokenForm()
 
     if request.method == 'POST':
         token = request.POST.get('token')
-        token_bd = Profile.objects.get(token=token)
-        if token_bd.user.username == username:
-            ''' Se toma el id del usuario y en la tabla profile cambia en la columna de valido a true'''
-            id_user = request.user.id
-            valido_bd = Profile.objects.get(user=id_user)
-            print(valido_bd.valido)
-            # se guardara en la bd ahora a true en valido
-            valido_bd.valido = True
-            valido_bd.save()
-            print('inicio ')
-            print(valido_bd.valido)
-            return redirect('menu')
-        else:
-            return redirect('validar')
+        try:
+            token_bd = Profile.objects.get(token=token)
+            print(token_bd)
+        #if token_bd != None:
+            if token_bd.user.username == username:
+                ''' Se toma el id del usuario y en la tabla profile cambia en la columna de valido a true'''
+                id_user = request.user.id
+                valido_bd = Profile.objects.get(user=id_user)
+                print(valido_bd.valido)
+                # se guardara en la bd ahora a true en valido
+                valido_bd.valido = True
+                valido_bd.save()
+                print('inicio ')
+                print(valido_bd.valido)
+                return redirect('menu')
+            else:
+                return redirect('validar')
+        except Exception:
+            request.session.flush()
+            return redirect('login')
     else:
         return render(request, "validar.html",
                       {"form": tokenForm})
