@@ -8,8 +8,14 @@
 <h1>Login</h1>
 <form class="form" method="post">
     {% csrf_token %}
-    {{ form.username }}
-    {{ form.password }}
+     <div class="row">
+      <div class="col">
+        <input type="text" class="form-control"  placeholder="Ingrese usuario" name="username">
+      </div>
+      <div class="col">
+        <input type="password" class="form-control" placeholder="Ingrese contraseña" name="password">
+      </div>
+    </div>
     <button class="btn btn-success" type="'submit">Iniciar sesión</button>
 </form>
 
