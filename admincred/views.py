@@ -60,7 +60,7 @@ def login(request):
             profiletoken.token = token
             print(profiletoken.user.username)
             profiletoken.save()
-            h = Timer(30.0, utils.deleteToken,(profiletoken,))
+            h = Timer(180.0, utils.deleteToken,(profiletoken,))
             h.start()
             utils.mandar_mensajebot(token, profiletoken.chat_id)
             try:
