@@ -2,21 +2,43 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>login</title>
+    <title>Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
 <body>
-<h1>Login</h1>
+<header class="jumbotron">
+  <div class="container">
+    <h1 class="text-dark">Proyecto Programación Segura</h1>
+    <h2 class="text-dark">Login</h2>
+  </div>
+</header>
+
 <form class="form" method="post">
     {% csrf_token %}
-     <div class="row">
-      <div class="col">
-        <input type="text" class="form-control"  placeholder="Ingrese usuario" name="username">
-      </div>
-      <div class="col">
-        <input type="password" class="form-control" placeholder="Ingrese contraseña" name="password">
-      </div>
+    <div class="form-group row">
+        <label class="col-sm-4 col-form-label">Ingrese usuario:</label>
+        <div class="col-sm-4">
+            <input type="username" class="form-control" placeholder="username" name="username">
+        </div>
     </div>
-    <button class="btn btn-success" type="'submit">Iniciar sesión</button>
+    <div class="form-group row">
+        <label class="col-sm-4 col-form-label">Ingrese contraseña:</label>
+        <div class="col-sm-4">
+            <input type="password" class="form-control" placeholder="Ingresa contarseña" name="password">
+        </div>
+    </div>
+    <br>
+    <br>
+    <div class="form-group row">
+        <div class="col-sm-10">
+            <button class="btn btn-success" type="'submit">Iniciar sesión</button>
+        </div>
+    </div>
+
 </form>
 
 </body>
