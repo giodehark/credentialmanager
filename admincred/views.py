@@ -1,5 +1,4 @@
 from threading import Timer
-
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
@@ -11,6 +10,7 @@ from .models import User
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login as do_login
 from . import decorators
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 # Create your views here.
 
 def index(request):
@@ -34,6 +34,7 @@ def profile_register(request):
             datapro.save()
             data_form.save(commit=False)
             register = True
+            return redirect('login')
         else:
             HttpResponse("<h1> Algo malo sucedio </h1>")
     else:
@@ -162,7 +163,8 @@ def menu(request):
         'username': username,
     })
 
-
+class CrearCredencial(CreateView):
+    pass
 
 
 

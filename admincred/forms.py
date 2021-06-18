@@ -23,7 +23,7 @@ class ProfileForm(UserCreationForm):
             'password2',
 
         )
-        help_texts = {k: "" for k in fields} # ayuda a quitar los mensajes de ayuda
+#        help_texts = {k: "" for k in fields} # ayuda a quitar los mensajes de ayuda
 
 
 class DataProfileForm(forms.ModelForm):
@@ -66,3 +66,7 @@ class tokenForm(forms.ModelForm):
                 }
             ),
         }
+
+
+
+

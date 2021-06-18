@@ -12,3 +12,15 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.user.username
+
+
+
+'''
+class Credenciales(models.Model):
+    id = models.AutoField(primary_key=True, null=False)
+    cuenta = models.CharField("Nombre de cuenta de credencial", max_length=25, blank=False, null=False)
+    iv = models.CharField("Vector de inicialización", max_length=70)
+    data_cifrada = models.CharField(max_length=70)
+    
+    
+'''
