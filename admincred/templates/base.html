@@ -1,0 +1,28 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>{% block title %}{% endblock %}</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href=" {% static '/css/style2.css' %}">
+
+    {% block extrahead %}
+    {% endblock %}
+
+</head>
+ {% include 'cabecera.html' %}
+{% include 'menu.html' %}
+<body>
+
+    {% block content %}
+
+    {% endblock content %}
+<br>
+<br>
+</body>
+{% include 'pie_pag.html' %}
+</html>

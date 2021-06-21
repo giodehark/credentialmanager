@@ -18,6 +18,7 @@ from django.urls import path
 from django.urls import include
 from admincred import views
 from django.contrib.auth.views import LoginView, LogoutView
+from admincred.views import CrearCredencial
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,5 +28,7 @@ urlpatterns = [
     path('logout/', views.logout, name='logout'),
     path('validar/', views.validar_token, name='validar'),
     path('user/menu/', views.menu, name='menu'),
+    path('user/crear/', CrearCredencial.as_view(), name='crear'),
+
 
 ]

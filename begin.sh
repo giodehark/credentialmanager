@@ -1,4 +1,4 @@
-!/bin/bash
+#!/bin/bash
 
 [[ -f "$1"  ]] || { echo "se espera como primer parametro un archivo .env"; exit 1; }
 

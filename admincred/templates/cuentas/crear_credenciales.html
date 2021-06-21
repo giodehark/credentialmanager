@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Crear creencial</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../../static/css/style_credencial.css">
+    <script src="../../static/js/credenciales.js"></script>
+</head>
+<body>
+<div class="container center">
+    <a href="#login" class="btn btn-large teal modal-trigger">Login</a>
+</div>
+
+<div id="login" class="modal ">
+    <h5 class="modal-close">&#10005;</h5>
+    <div class="modal-content center"><h4>Crear credencial</h4>
+        <form action="#">
+            <div class="input-field">
+                <i class="material-icons prefix">person</i>
+                <input type="text" id="cuenta">
+                <label for="Cuenta">cuenta</label>
+            </div>
+            <br>
+            <div class="input-field">
+                <i class="material-icons prefix">person</i>
+                <input type="text" id="user">
+                <label for="user">Usuario</label>
+            </div>
+            <br>
+            <div class="input-field">
+                <i class="material-icons prefix">lock</i>
+                <input type="password" id="passcuen">
+                <label for="passcuen">Password de la cuenta</label>
+            </div>
+            <br>
+            <div class="input-field">
+                <i class="material-icons prefix">person</i>
+                <input type="text" id="notas">
+                <label for="notas">Notas</label>
+            </div>
+            <br>
+            <div class="input-field">
+                <i class="material-icons prefix">lock</i>
+                <input type="password" id="pwd">
+                <label for="pwd"> Contraseña de usuario</label>
+            </div>
+            <br>
+            <div class="left" style="margin-left:20px;">
+                <input type="checkbox" id="check">
+                <label for="check">Remember Me</label>
+            </div>
+            <br>
+            <input type="submit" value="Login" class="btn btn-large">
+        </form>
+    </div>
+</div>
+
+</body>

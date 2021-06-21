@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Crear cuenta{% endblock %}
+
+{% block content %}
+
+<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+
+<form class="form-horizontal" action='' method="POST">
+    {% csrf_token %}
+    <fieldset>
+      <div id="legend">
+          <legend class="">Crear credencial</legend>
+      </div>
+
+      <div class="control-group">
+      <!-- cuenta -->
+          {{ form.cuenta.label }}
+          <div class="controls">
+              {{ form.cuenta }}
+              <p class="help-block">Ingresa el nombre de la cuenta ejemplo: Amazon</p>
+          </div>
+      </div>
+
+
+    <div class="control-group">
+      <!-- Username -->
+      {{ form.user_cifrado.label }}
+        <div class="controls">
+            {{ form.user_cifrado }}
+            <p class="help-block">Ingresa el usuario de la cuenta</p>
+      </div>
+    </div>
+
+
+    <div class="control-group">
+      <!-- Password-->
+        {{ form.pass_cifrado.label }}
+      <div class="controls">
+        {{ form.pass_cifrado }}
+          <p class="help-block"> Ingrese contraseña de la cuenta</p>
+      </div>
+    </div>
+
+        <div class="control-group">
+      <!-- notas -->
+      {{ form.notas.label }}
+        <div class="controls">
+            {{ form.notas }}
+            <p class="help-block">Ingresa el usuario de la cuenta</p>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <!-- Password -->
+        {{ form.pwd.label }}
+      <div class="controls">
+          {{ form.pwd }}
+        <p class="help-block">Ingrese la contraseña del sistema</p>
+      </div>
+    </div>
+        {% if errores %}
+            <div class="p-3 mb-2 bg-danger text-white">
+            <h5>{{ errores }}</h5>
+            </div>
+        {% endif %}
+
+    <div class="control-group">
+      <!-- Button -->
+      <div class="controls">
+        <button class="btn btn-success">Crear</button>
+      </div>
+    </div>
+  </fieldset>
+</form>
+
+{% endblock content %}

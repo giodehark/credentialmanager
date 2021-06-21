@@ -1,7 +1,15 @@
+from cryptography.hazmat.primitives.kdf.hkdf import HKDF
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+import os
+import base64
+import sys
+from getpass import getpass
 import random
 import string
-
 import requests
+
 
 
 def randomString(stringLength):
@@ -28,3 +36,38 @@ def deleteToken(profiletoken):
     print("Entró la función de eliminar token")
     print(profiletoken.user.username)
     profiletoken.save()
+
+def generarIv():
+    iv = os.urandom(16)
+    return iv
+
+def generar_llave_aes_from_password(password):
+    password = password.encode('utf-8')
+    derived_key = HKDF(algorithm=hashes.SHA256(),
+                       length=32,
+                       salt=None,
+                       info=b'handshake data ',
+                       backend=default_backend()).derive(password)
+    return derived_key
+
+
+
+def cifrarDatos(datos, iv, llave_aes):
+    print(datos)
+    print(iv)
+    print(llave_aes)
+    aesCipher = Cipher(algorithms.AES(llave_aes), modes.CTR(iv),
+                       backend=default_backend())
+    cifrador = aesCipher.encryptor()
+    cifrado = cifrador.update(datos)
+    cifrador.finalize()
+    return cifrado
+
+
+def descifrar(cifrado, llave_aes, iv):
+    aesCipher = Cipher(algorithms.AES(llave_aes), modes.CTR(iv),
+                       backend=default_backend())
+    descifrador = aesCipher.decryptor()
+    plano = descifrador.update(cifrado)
+    descifrador.finalize()
+    return plano

@@ -32,6 +32,11 @@
         </div>
     </div>
     <br>
+    {% if errores %}
+        <div class="p-3 mb-2 bg-danger text-white">
+            <h5>{{ errores }}</h5>
+        </div>
+    {% endif %}
     <br>
     <div class="form-group row">
         <div class="col-sm-10">

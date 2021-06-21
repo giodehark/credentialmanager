@@ -1,0 +1,24 @@
+{% load static %}
+
+<nav class="container-fluid navbar-inverse navbar-fixed-top navbar-collapse" style="background-color: lightslategrey" >
+  <div class="navbar-header">
+    <a class="navbar-brand" href="{% url 'menu' %}?next={{request.path}}" style="color: whitesmoke">Home</a>
+  </div>
+
+    {% if user.is_authenticated %}
+          <ul class="nav navbar-nav">
+        <li><a href="{% url 'crear' %}" style="color: whitesmoke" >Nueva credencial</a></li>
+          </ul>
+        <ul class="nav navbar-nav navbar-right">
+            <li><a href="{% url 'logout'%}" style="color: whitesmoke" ><span class="glyphicon glyphicon-log-in"></span> Cerrar Sesión</a></li>
+        </ul>
+    {% else %}
+        <ul class="nav navbar-nav">
+            <li><a href="{% url 'reg' %}" style="color: whitesmoke" >Registrate</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+        <li><a href="{% url 'login'%}?" style="color: whitesmoke"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+        </ul>
+
+    {% endif %}
+</nav>

@@ -1,10 +1,12 @@
+import base64
 from threading import Timer
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from . import utils
-from .forms import ProfileForm, DataProfileForm, LoginForm, tokenForm
-from .models import Profile
+from .forms import ProfileForm, DataProfileForm, LoginForm, tokenForm, CredentialForm
+from .models import Profile, Credenciales, Compartir
 from django.contrib.auth.forms import UserCreationForm
 from .models import User
 from django.http import HttpResponse
@@ -70,11 +72,15 @@ def login(request):
                 # request.session.set_expiry(settings.EXPIRY_TIME)
                 return redirect('validar')
             except Exception:
-                return render(request, 'login.html', {"form": LoginForm, "errores": "Error al iniciar sesión"})
+                form = CredentialForm(request.POST)
+                errores = 'Error al iniciar sesión , vuelve a intentarlo'
+                return render(request, 'login.html', {"form": LoginForm,
+                                                      "errores": errores, })
         else:
+            errores = "Usuario y/o contraseña inválidos."
             return render(request, 'login.html',
-                          {"form": LoginForm, "errores": "Usuario y/o contraseña inválidos.",
-                           "valide_user": valide_user,
+                          {"form": LoginForm,
+                           "errores": errores,
                            })
 
     elif request.method == "GET":
@@ -135,36 +141,75 @@ def logout(request):
 def menu(request):
     '''se tomara al usuario que inicio sesion y se mostraran sus credenciales'''
 
-    '''falta poner decorador de inicio sesion y si pasa entonces tomamos el id del usuario
-    '''
-
-    ''' en el validar token falta que al autenticar token si esta bien 
-    entonces se procede a cambiar a true la columna valido, asi se procedera 
-    a crear un decorador que podra ser usado en otras vistas '''
     username = request.user.username
-
-    '''
-    id_user =request.user.id
-
-    print(id_user)
-    valido_bd = Profile.objects.get(user=id_user)
-    print(valido_bd.valido)
-    #se guardara en la bd ahora a true en valido
-    valido_bd.valido = True
-    valido_bd.save()
-    print(valido_bd.valido)
-    #profilevalido = Profile.objects.get(user=username.id)
-    #profilevalido.valido = token
-    #print(profilevalido.user.username)
-    #profilevalido.save()
-    '''
-
-    return render(request, 'menu_user.html', {
+    return render(request, 'cuentas/menu_user.html', {
         'username': username,
     })
 
 class CrearCredencial(CreateView):
+    model = Credenciales
+    form_class = CredentialForm
+    template_name = 'cuentas/crear_cuenta.html'
+    success_url = 'menu'
+
+    def post(self, request, *args, **kwargs):
+        passmaster = request.POST['pwd']
+        username = request.user.username
+        user = User.objects.get(username=username)
+        contrasenahash= make_password(passmaster)
+        print('verificacion pass')
+        print(user.password)
+        print(contrasenahash)
+        if not check_password(passmaster, user.password):
+            form = CredentialForm(request.POST)
+            errores= 'Tu contraseña maestra es erronea, vuelve a intentarlo'
+            context = {'errores': errores,
+                       'form': form,
+                       }
+            print('No se guardo la credencial passmaster mal')
+            return render(request, 'cuentas/crear_cuenta.html', context)
+        else:
+            form = CredentialForm(request.POST)
+            print('entro pass valida')
+            if form.is_valid():
+                credential=form.save(commit=False)
+                credential.user = user
+                iv = utils.generarIv()
+                llave_aes = utils.generar_llave_aes_from_password(passmaster)
+                print('password plana cuenta', request.POST['pass_cifrado'])
+                pwd_binario = (request.POST['pass_cifrado']).encode('ascii')
+                print('la password binaria', pwd_binario)
+                pwd_cifrada = utils.cifrarDatos(pwd_binario, iv, llave_aes)
+                print(pwd_cifrada)
+                print('usuario no cifrado', request.POST['user_cifrado'])
+                user_binario = (request.POST['user_cifrado']).encode('ascii')
+                print(('usuario en binario', user_binario))
+                user_cifrada = utils.cifrarDatos(user_binario, iv, llave_aes)
+                print('usuario cifrado', user_cifrada)
+                user_notas = request.POST['notas']
+                print('notas guardadas', user_notas)
+                credential.pass_cifrado = pwd_cifrada
+                credential.user_cifrado = user_cifrada
+                iv_plano = base64.b64encode(iv)
+                print('iv plano', iv_plano)
+                credential.iv = iv_plano
+                credential.notas = user_notas
+                print('antes del save')
+                form.save()
+                print('se guardo')
+                return redirect('menu')
+            else:
+                print('no valido el form')
+                print(form.errors)
+
+class ListarCredenciales(ListView):
     pass
+
+
+
+class EditarCredenciales(UpdateView):
+    pass
+
 
 
 

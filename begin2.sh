@@ -1,4 +1,4 @@
-!/bin/bash
+#!/bin/bash
 
 [[ -f "$1"  ]] || { echo "se espera como primer parametro un archivo .env"; exit 1; }
 
@@ -27,7 +27,7 @@ do
       python3 manage.py migrate;;
     3)
       echo "Creando nueva migración";
-      python3 manage.py makemigration;;
+      python3 manage.py makemigrations;;
     4)
       break;;
     *) echo "$REPLY Es una opción inválida";

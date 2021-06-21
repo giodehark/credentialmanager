@@ -1,0 +1,16 @@
+.sidebar-nav {
+    margin-top: 10px;
+    margin-outside: 10px;
+    padding: 10px;
+    list-style: none;
+
+}
+
+.post-form, .post-form input {
+    width: 10%;
+}
+
+h1,h2,h3,h4{
+    font-family: "Bitstream Vera Sans Mono", Monaco, "Courier New", Courier, monospace;
+}
+

@@ -15,12 +15,17 @@ class Profile(models.Model):
 
 
 
-'''
+
 class Credenciales(models.Model):
     id = models.AutoField(primary_key=True, null=False)
-    cuenta = models.CharField("Nombre de cuenta de credencial", max_length=25, blank=False, null=False)
-    iv = models.CharField("Vector de inicialización", max_length=70)
-    data_cifrada = models.CharField(max_length=70)
-    
-    
-'''
+    user = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE)
+    cuenta = models.CharField("Nombre de cuenta de credencial", max_length=30, blank=False, null=False)
+    iv = models.CharField("Vector de inicialización", max_length=100, blank=True, null=True)
+    user_cifrado = models.CharField(max_length=100, blank=True, null=True)
+    pass_cifrado = models.CharField(max_length=100, blank=True, null=True)
+    notas = models.CharField(max_length=150, blank= True, null=True)
+
+
+class Compartir(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    contrasena = models.ForeignKey(Credenciales, on_delete=models.CASCADE)
