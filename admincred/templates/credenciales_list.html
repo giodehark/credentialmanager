@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Crear cuenta{% endblock %}
+
+{% block content %}
+
+<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+
+    <div id="legend">
+        <legend class="">Listar Cuentas</legend>
+    </div>
+    {%  if credencial_list %}
+        <ul>
+            {% for credencial in credencial_list %}
+                <li>
+                    <a href="{{ credencial.get_absolute_url }}">{{ credencial.cuenta }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No tiene cuentas asociadas</p>
+    {% endif %}
+
+    {% if errores %}
+        <div class="p-3 mb-2 bg-danger text-white">
+            <h5>{{ errores }}</h5>
+        </div>
+    {% endif %}
+
+
+{% endblock content %}

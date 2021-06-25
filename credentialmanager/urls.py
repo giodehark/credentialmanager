@@ -18,7 +18,7 @@ from django.urls import path
 from django.urls import include
 from admincred import views
 from django.contrib.auth.views import LoginView, LogoutView
-from admincred.views import CrearCredencial
+from admincred.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,6 +29,11 @@ urlpatterns = [
     path('validar/', views.validar_token, name='validar'),
     path('user/menu/', views.menu, name='menu'),
     path('user/crear/', CrearCredencial.as_view(), name='crear'),
+    #path('user/listar/', CredencialesListView.as_view(), name='listar'),
+    path('user/listar/', views.CredencialesList, name='listar'),
+    path('user/<int:id>/', CredencialDetailView, name='cuenta_detail'),
+    #path('user/detalles/', CredencialDetailView.as_view(), name='cuenta_detail')
+    # path('user/listar/', CredencialesLisView.as_view(template_name="../templates/cuentas/cuentas_list.html"), name='listar'),
 
 
 ]

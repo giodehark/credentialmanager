@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Cuentas Lista</h1>
+
+    {% if credenciales_list %}
+    <ul>
+      {% for credencial in credenciales_list %}
+      <li>
+          <h4>{{ credencial.id }} - <a href="{{ credencial.get_absolute_url  }}"> {{ credencial.cuenta }}</a>
+              {{ credencial.user }} </h4>
+          <h5>{{ credencial.notas }}</h5>
+      </li>
+      {% endfor %}
+
+    </ul>
+    {% else %}
+      <p>There are no authors in the library.</p>
+    {% endif %}
+{% endblock %}

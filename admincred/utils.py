@@ -9,7 +9,7 @@ from getpass import getpass
 import random
 import string
 import requests
-
+from django.contrib.auth.models import User
 
 
 def randomString(stringLength):
@@ -54,7 +54,7 @@ def generar_llave_aes_from_password(password):
 
 def cifrarDatos(datos, iv, llave_aes):
     print(datos)
-    print(iv)
+    print('iv encodebase64',iv)
     print(llave_aes)
     aesCipher = Cipher(algorithms.AES(llave_aes), modes.CTR(iv),
                        backend=default_backend())
@@ -65,9 +65,15 @@ def cifrarDatos(datos, iv, llave_aes):
 
 
 def descifrar(cifrado, llave_aes, iv):
+    print('tipos de datos',cifrado, type(cifrado),llave_aes, type(llave_aes),iv, type(iv))
     aesCipher = Cipher(algorithms.AES(llave_aes), modes.CTR(iv),
                        backend=default_backend())
     descifrador = aesCipher.decryptor()
     plano = descifrador.update(cifrado)
     descifrador.finalize()
     return plano
+
+#def obtenerId():
+    #username = request.user.username
+    #userid = User.objects.get(username=username)
+    #return userid

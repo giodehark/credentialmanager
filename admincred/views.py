@@ -4,14 +4,16 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
+from django.views import generic
 from . import utils
-from .forms import ProfileForm, DataProfileForm, LoginForm, tokenForm, CredentialForm
+from .forms import ProfileForm, DataProfileForm, LoginForm, tokenForm, CredentialForm, PassmasterForm
 from .models import Profile, Credenciales, Compartir
 from django.contrib.auth.forms import UserCreationForm
-from .models import User
+from .models import *
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login as do_login
 from . import decorators
+import requests
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 # Create your views here.
 
@@ -156,10 +158,8 @@ class CrearCredencial(CreateView):
         passmaster = request.POST['pwd']
         username = request.user.username
         user = User.objects.get(username=username)
-        contrasenahash= make_password(passmaster)
         print('verificacion pass')
         print(user.password)
-        print(contrasenahash)
         if not check_password(passmaster, user.password):
             form = CredentialForm(request.POST)
             errores= 'Tu contraseña maestra es erronea, vuelve a intentarlo'
@@ -175,6 +175,7 @@ class CrearCredencial(CreateView):
                 credential=form.save(commit=False)
                 credential.user = user
                 iv = utils.generarIv()
+                print('es el iv random', iv)
                 llave_aes = utils.generar_llave_aes_from_password(passmaster)
                 print('password plana cuenta', request.POST['pass_cifrado'])
                 pwd_binario = (request.POST['pass_cifrado']).encode('ascii')
@@ -188,8 +189,8 @@ class CrearCredencial(CreateView):
                 print('usuario cifrado', user_cifrada)
                 user_notas = request.POST['notas']
                 print('notas guardadas', user_notas)
-                credential.pass_cifrado = pwd_cifrada
-                credential.user_cifrado = user_cifrada
+                credential.pass_cifradoo = pwd_cifrada
+                credential.user_cifradoo = user_cifrada
                 iv_plano = base64.b64encode(iv)
                 print('iv plano', iv_plano)
                 credential.iv = iv_plano
@@ -202,9 +203,97 @@ class CrearCredencial(CreateView):
                 print('no valido el form')
                 print(form.errors)
 
-class ListarCredenciales(ListView):
-    pass
+class CredencialesListView(generic.ListView):
+    model = Credenciales
+    template_name = "../templates/cuentas/cuentas_list.html"
+    #username = request.user.username
 
+    def get_context_data(self, *, object_list=None, **kwargs,):
+        #id_user = utils.ObtenerId()
+        #print('valor de usuario registrado',id_user)
+        context = super(CredencialesListView, self).get_context_data(**kwargs)
+        context['some_data'] = 'Esta es informacion'
+        print('elementos dentro del context', context)
+        #return render(request, 'cuentas/cuentas_list.html', context)
+        return context
+
+
+
+def CredencialesList(request):
+    model = Credenciales
+    username = request.user.username
+    user = User.objects.get(username=username)
+    print('datpsde credencial list')
+    print('este es el nombre del usuario', user)
+    id_user = request.user.id
+    print('este es el id del usuario logeado', id_user)
+    credenciales_list = Credenciales.objects.filter(user_id=id_user)
+    print(credenciales_list)
+    return render(request, '../templates/cuentas/cuentas_list.html',
+                  {'credenciales_list': credenciales_list})
+
+
+def CredencialDetailView(request, id):
+    model = Credenciales
+    form = PassmasterForm
+    print('es es el id principal', id)
+    elemento = Credenciales.objects.get(id=id)  # toma los datos del objeto es decir los datos de la colunna
+    print('la primera impresion de elemento', elemento)
+    confirmacion= False
+
+    if request.method == 'POST':
+        passmast = request.POST.get('passmaster')
+        username = request.user.username
+        user = User.objects.get(username=username)
+        print('verificacion usuario tal', user)
+        if not check_password(passmast, user.password):
+            errores= 'tu contrasena passmarter mal'
+            context = {
+                'errores': errores,
+                'credencial': elemento,
+                'form': form,
+            }
+            print('la passmaster no es correcta')
+            return render(request, 'cuentas/cuenta_detail_cp.html', context)
+        else:
+            print('passmaster valida')
+            elemento = Credenciales.objects.get(id=id)  # toma los datos del objeto es decir los datos de la colunna
+            usuario_cifrado = elemento.user_cifradoo
+            print('el usuario cifradoe es:', usuario_cifrado)
+            '''sacamos la llave y datos para descifrar'''
+            llave_aes = utils.generar_llave_aes_from_password(passmast)
+            print('esta es la llave aes', llave_aes)
+            iv_bd = elemento.iv
+            iv_normal = base64.b64decode(iv_bd)
+            print('este es el iv dedode', iv_normal, type(iv_normal), len(iv_normal))
+            user_cifrado = elemento.user_cifradoo
+            print('es el user cifrado', user_cifrado)
+            user_descifrado = utils.descifrar(user_cifrado, llave_aes, iv_normal)
+            user_plano = user_descifrado.decode('ascii')
+            print('se descifro user :', user_descifrado, type(user_descifrado), 'el dato plano', user_plano)
+            pass_cifrado = elemento.pass_cifradoo
+            print('el pass cifrado es', pass_cifrado)
+            pass_descifrado = utils.descifrar(pass_cifrado, llave_aes, iv_normal)
+            pass_plano = pass_descifrado.decode('ascii')
+            print('el pass descifrado es', pass_descifrado, type(pass_descifrado), 'el dato plano', pass_plano)
+
+            confirmacion =True
+            context = {
+                'user_plano': user_plano,
+                'pass_plano': pass_plano,
+                'confirmacion': confirmacion,
+                'credencial': elemento,
+            }
+            return render(request, 'cuentas/cuenta_detail_cp.html', context)
+    else:
+        elemento = Credenciales.objects.get(id=id)
+        context = {
+            'form': form,
+            'credencial': elemento,
+        }
+        print('lo que trae el elemento:', elemento)
+        print('no es post no es correcta')
+        return render(request, 'cuentas/cuenta_detail_cp.html', context)
 
 
 class EditarCredenciales(UpdateView):

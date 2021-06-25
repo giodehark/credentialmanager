@@ -8,8 +8,6 @@ from . import utils
 
 class ProfileForm(UserCreationForm):
 
-    #password1 = forms.CharField(label='Contraseña', widget=forms.PasswordInput)
-    #password2 = forms.CharField(label='Confirma contraseña', widget=forms.PasswordInput)
     first_name = forms.CharField(max_length=20, required=True)
     last_name = forms.CharField(max_length=35, required=True)
     email = forms.EmailField(required=True)
@@ -69,7 +67,7 @@ class tokenForm(forms.ModelForm):
 
 class CredentialForm(forms.ModelForm):
     # MML verificacion de Contraseña
-    pwd = forms.CharField(label='COntraseña maestra', widget=forms.PasswordInput(
+    pwd = forms.CharField(label='Contraseña maestra', widget=forms.PasswordInput(
         attrs={
             'class': 'form-control',
             'placeholder': 'Ingrese de login',
@@ -77,13 +75,28 @@ class CredentialForm(forms.ModelForm):
             'required': 'required',
         }
     ))
+    user_cifrado = forms.CharField(label='usuario de la cuenta', widget=forms.TextInput(
+        attrs={
+            'placeholder': 'ingrese el usuario de la cuenta',
+            'name': 'usuario_cuenta',
+            'id': 'user_cifrado',
+        }
+    ))
+    pass_cifrado = forms.CharField(label='contraseña cuenta', widget=forms.PasswordInput(
+        attrs={
+            'placeholder': 'Ingrese su contrasena de cuenta',
+            'name': 'passcuenta',
+            'id': 'pass_cifrado',
+        }
+    ))
+
     class Meta:
         model = Credenciales
-        fields = ['cuenta', 'user_cifrado', 'pass_cifrado', 'notas']
+        fields = ['cuenta', 'notas']
         labels = {
             'cuenta': 'Nombre de la cuenta',
-            'user_cifrado': 'Usuario de la cuenta',
-            'pass_cifrado': 'Contrasena de cuenta',
+            #'user_cifradoo': 'Usuario de la cuenta',
+            #'pass_cifrado': 'Contrasena de cuenta',
             'notas': 'Notas credenciales',
 
         }
@@ -96,20 +109,6 @@ class CredentialForm(forms.ModelForm):
 
                 }
             ),
-            'user_cifrado': forms.TextInput(
-                attrs={
-                    'placeholder':'ingrese el usuario de la cuenta',
-                    'name': 'usuario_cuenta',
-                    'id': 'user_cifrado',
-                }
-            ),
-            'pass_cifrado': forms.PasswordInput(
-                attrs={
-                    'placeholder': 'Ingrese su contrasena de cuenta',
-                    'name': 'passcuenta',
-                    'id': 'pass_cifrado',
-                }
-            ),
             'notas': forms.TextInput(
                 attrs={
                     'placeholder':' ingrese notas de la credencial',
@@ -120,3 +119,13 @@ class CredentialForm(forms.ModelForm):
             )
         }
 
+
+class PassmasterForm(AuthenticationForm):
+    # MML verificacion de Contraseña
+    passmaster = forms.CharField(label='Contraseña maestra', widget=forms.PasswordInput(
+        attrs={
+            'class': 'form-control',
+            'placeholder': 'Ingrese Passmaster inicio de sesion de este sistema',
+            'id': 'passmaster',
+        }
+    ))
