@@ -1,4 +1,5 @@
 import base64
+from pyexpat.errors import messages
 from threading import Timer
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password, check_password
@@ -30,8 +31,6 @@ def profile_register(request):
         if profile_form.is_valid() and data_form.is_valid():
             user = profile_form.save()
             user.set_password(user.password)
-            #print(user.set_password(user.password))
-            #user.save()
             profile_form.save()
             datapro = data_form.save(commit=False)
             datapro.user = user
@@ -99,7 +98,7 @@ def validar_token(request):
         try:
             token_bd = Profile.objects.get(token=token)
             print(token_bd)
-        #if token_bd != None:
+
             if token_bd.user.username == username:
                 ''' Se toma el id del usuario y en la tabla profile cambia en la columna de valido a true'''
                 id_user = request.user.id
@@ -203,27 +202,13 @@ class CrearCredencial(CreateView):
                 print('no valido el form')
                 print(form.errors)
 
-class CredencialesListView(generic.ListView):
-    model = Credenciales
-    template_name = "../templates/cuentas/cuentas_list.html"
-    #username = request.user.username
 
-    def get_context_data(self, *, object_list=None, **kwargs,):
-        #id_user = utils.ObtenerId()
-        #print('valor de usuario registrado',id_user)
-        context = super(CredencialesListView, self).get_context_data(**kwargs)
-        context['some_data'] = 'Esta es informacion'
-        print('elementos dentro del context', context)
-        #return render(request, 'cuentas/cuentas_list.html', context)
-        return context
-
-
-
+@login_required
 def CredencialesList(request):
     model = Credenciales
     username = request.user.username
     user = User.objects.get(username=username)
-    print('datpsde credencial list')
+    print('datos de credencial list')
     print('este es el nombre del usuario', user)
     id_user = request.user.id
     print('este es el id del usuario logeado', id_user)
@@ -232,7 +217,7 @@ def CredencialesList(request):
     return render(request, '../templates/cuentas/cuentas_list.html',
                   {'credenciales_list': credenciales_list})
 
-
+@login_required
 def CredencialDetailView(request, id):
     model = Credenciales
     form = PassmasterForm
@@ -240,65 +225,93 @@ def CredencialDetailView(request, id):
     elemento = Credenciales.objects.get(id=id)  # toma los datos del objeto es decir los datos de la colunna
     print('la primera impresion de elemento', elemento)
     confirmacion= False
-
-    if request.method == 'POST':
-        passmast = request.POST.get('passmaster')
-        username = request.user.username
-        user = User.objects.get(username=username)
-        print('verificacion usuario tal', user)
-        if not check_password(passmast, user.password):
-            errores= 'tu contrasena passmarter mal'
-            context = {
-                'errores': errores,
-                'credencial': elemento,
-                'form': form,
-            }
-            print('la passmaster no es correcta')
-            return render(request, 'cuentas/cuenta_detail_cp.html', context)
-        else:
-            print('passmaster valida')
-            elemento = Credenciales.objects.get(id=id)  # toma los datos del objeto es decir los datos de la colunna
-            usuario_cifrado = elemento.user_cifradoo
-            print('el usuario cifradoe es:', usuario_cifrado)
-            '''sacamos la llave y datos para descifrar'''
-            llave_aes = utils.generar_llave_aes_from_password(passmast)
-            print('esta es la llave aes', llave_aes)
-            iv_bd = elemento.iv
-            iv_normal = base64.b64decode(iv_bd)
-            print('este es el iv dedode', iv_normal, type(iv_normal), len(iv_normal))
-            user_cifrado = elemento.user_cifradoo
-            print('es el user cifrado', user_cifrado)
-            user_descifrado = utils.descifrar(user_cifrado, llave_aes, iv_normal)
-            user_plano = user_descifrado.decode('ascii')
-            print('se descifro user :', user_descifrado, type(user_descifrado), 'el dato plano', user_plano)
-            pass_cifrado = elemento.pass_cifradoo
-            print('el pass cifrado es', pass_cifrado)
-            pass_descifrado = utils.descifrar(pass_cifrado, llave_aes, iv_normal)
-            pass_plano = pass_descifrado.decode('ascii')
-            print('el pass descifrado es', pass_descifrado, type(pass_descifrado), 'el dato plano', pass_plano)
-
-            confirmacion =True
-            context = {
-                'user_plano': user_plano,
-                'pass_plano': pass_plano,
-                'confirmacion': confirmacion,
-                'credencial': elemento,
-            }
-            return render(request, 'cuentas/cuenta_detail_cp.html', context)
+    username = request.user.username
+    user = User.objects.get(username=username)
+    id_user = request.user.id
+    if elemento.user_id != id_user:
+        print('no esta asociado a esta credencial')
+        return redirect('listar')
     else:
-        elemento = Credenciales.objects.get(id=id)
-        context = {
-            'form': form,
-            'credencial': elemento,
-        }
-        print('lo que trae el elemento:', elemento)
-        print('no es post no es correcta')
-        return render(request, 'cuentas/cuenta_detail_cp.html', context)
+        if request.method == 'POST':
+            passmast = request.POST.get('passmaster')
+            print('verificacion usuario tal', user)
+
+            if not check_password(passmast, user.password):
+                errores = 'tu contrasena passmarter mal'
+                context = {
+                    'errores': errores,
+                    'credencial': elemento,
+                    'form': form,
+                }
+                print('la passmaster no es correcta')
+                return render(request, 'cuentas/cuenta_detail_cp.html', context)
+
+            else:
+                print('passmaster valida')
+                elemento = Credenciales.objects.get(id=id)  # toma los datos del objeto es decir los datos de la colunna
+                usuario_cifrado = elemento.user_cifradoo
+                print('el usuario cifradoe es:', usuario_cifrado)
+                '''sacamos la llave y datos para descifrar'''
+                llave_aes = utils.generar_llave_aes_from_password(passmast)
+                print('esta es la llave aes', llave_aes)
+                iv_bd = elemento.iv
+                iv_normal = base64.b64decode(iv_bd)
+                print('este es el iv dedode', iv_normal, type(iv_normal), len(iv_normal))
+                user_cifrado = elemento.user_cifradoo
+                print('es el user cifrado', user_cifrado)
+                user_descifrado = utils.descifrar(user_cifrado, llave_aes, iv_normal)
+                user_plano = user_descifrado.decode('ascii')
+                print('se descifro user :', user_descifrado, type(user_descifrado), 'el dato plano', user_plano)
+                pass_cifrado = elemento.pass_cifradoo
+                print('el pass cifrado es', pass_cifrado)
+                pass_descifrado = utils.descifrar(pass_cifrado, llave_aes, iv_normal)
+                pass_plano = pass_descifrado.decode('ascii')
+                print('el pass descifrado es', pass_descifrado, type(pass_descifrado), 'el dato plano', pass_plano)
+
+                confirmacion = True
+                context = {
+                    'user_plano': user_plano,
+                    'pass_plano': pass_plano,
+                    'confirmacion': confirmacion,
+                    'credencial': elemento,
+                }
+                return render(request, 'cuentas/cuenta_detail_cp.html', context)
+        else:
+            elemento = Credenciales.objects.get(id=id)
+            context = {
+                'form': form,
+                'credencial': elemento,
+            }
+            print('lo que trae el elemento:', elemento)
+            print('no es post no es correcta')
+            return render(request, 'cuentas/cuenta_detail_cp.html', context)
 
 
 class EditarCredenciales(UpdateView):
     pass
 
+@login_required
+def CredencialDelete(request, id):
+    model = Credenciales
+    print(id)
 
+    try:
+        elemento = Credenciales.objects.get(id=id)  # toma los datos del objeto es decir los datos de la colunna
+    except Credenciales.DoesNotExist:
+        print('no existe esa credencial ')
+        return redirect('listar')
+    #se obtiene el id del usuario que inicio sesion para poder
+    username = request.user.username
+    user = User.objects.get(username=username)
+    id_user = request.user.id
+    print('el usuario iniciado es', id_user, 'el usuario en bd que tiene esta credencial', elemento.id)
 
-
+    #si el user_id que creo la credencial guardado en la base de d
+    #datos no es igual al que esta en este momento logeado
+    if elemento.user_id != id_user:
+        messages.error(request, 'no eres el autor de este post')
+        return redirect('listar')
+    else:
+        elemento.delete()
+        print('la credencial {{elemento.cuenta}} ha sido eliminado')
+        return redirect('listar')

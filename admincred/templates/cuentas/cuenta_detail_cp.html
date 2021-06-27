@@ -16,6 +16,13 @@
             </dl>
         </div>
         <div class="p-3 mb-2 bg-success text-white">Confirmacion de Passmaster</div>
+
+        <div class="card-footer">
+        <a href="{%  url 'eliminar' credencial.id %}" class="btn btn-danger">
+            Eliminar credencial
+        </a>
+
+        </div>
         {% else %}
         <form class="form" method="post">
         {% csrf_token %}
@@ -31,6 +38,7 @@
                 <div class="col-sm-10">
                     <button class="btn btn-success" type="'submit"> ver detalles</button>
                 </div>
+
             </div>
         </form>
         {% if errores %}

@@ -29,9 +29,9 @@ urlpatterns = [
     path('validar/', views.validar_token, name='validar'),
     path('user/menu/', views.menu, name='menu'),
     path('user/crear/', CrearCredencial.as_view(), name='crear'),
-    #path('user/listar/', CredencialesListView.as_view(), name='listar'),
     path('user/listar/', views.CredencialesList, name='listar'),
     path('user/<int:id>/', CredencialDetailView, name='cuenta_detail'),
+    path('user/<int:id>/delete/', CredencialDelete, name='eliminar'),
     #path('user/detalles/', CredencialDetailView.as_view(), name='cuenta_detail')
     # path('user/listar/', CredencialesLisView.as_view(template_name="../templates/cuentas/cuentas_list.html"), name='listar'),
 
