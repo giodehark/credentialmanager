@@ -10,17 +10,16 @@
         <div>
             <h4> Datos</h4>
             <dl>
-                <dd><h5>usuario {{ user_plano }}</h5></dd>
-                <dd><h5>Password {{ pass_plano }}</h5></dd>
-                <dd><h5>Notas {{credencial.notas}}</h5></dd>
+                <dd><h5>usuario: {{ user_plano }}</h5></dd>
+                <dd><h5>Password: {{ pass_plano }}</h5></dd>
+                <dd><h5>Notas: {{credencial.notas}}</h5></dd>
             </dl>
         </div>
         <div class="p-3 mb-2 bg-success text-white">Confirmacion de Passmaster</div>
 
         <div class="card-footer">
-        <a href="{%  url 'eliminar' credencial.id %}" class="btn btn-danger">
-            Eliminar credencial
-        </a>
+            <a href="/user/{{ credencial.id }}/editar/" class="btn btn-success" type="button" data-dismiss="modal" >Editar</a>
+            <a href="{%  url 'eliminar' credencial.id %}" class="btn btn-danger">Eliminar</a>
 
         </div>
         {% else %}

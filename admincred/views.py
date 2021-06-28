@@ -22,6 +22,7 @@ def index(request):
     return render(request, 'index.html')
 
 def profile_register(request):
+    '''Vista de registro , la cual un usuario anonimo podra registrase'''
     register = False
     prueba= request.user.id
     print(prueba)
@@ -50,6 +51,9 @@ def profile_register(request):
     })
 
 def login(request):
+    '''Es el inicio de sesion el cual pedira el usuario y contraseña, en caso de que los datos sean correctos
+    mandara a llamar la funcion para enviar token al usario por medio de telegram y redireccionara  al usuario
+    a la vista de validar token'''
     valide_user = False
     if request.method == 'POST':
         nameuser = request.POST.get("username")
@@ -90,6 +94,8 @@ def login(request):
 
 @login_required
 def validar_token(request):
+    '''Validara que el token ingresado por el usuario concuerde con el registrado en la base de datos y si es correcto
+    permitira al usuario el acceso a las otras vistas'''
     username = request.user.username
     tokenform = tokenForm()
 
@@ -122,7 +128,7 @@ def validar_token(request):
 
 
 def logout(request):
-    """Se cerrara sesión ademas de que se borraran los datos de la sesión"""
+    """Se cerrara sesión del usuario, ademas de que se borraran los datos de la sesión"""
     id_user = request.user.id
     if id_user != None:
         valido_bd = Profile.objects.get(user=id_user)
@@ -140,14 +146,20 @@ def logout(request):
 
 @decorators.token_no_validado
 def menu(request):
-    '''se tomara al usuario que inicio sesion y se mostraran sus credenciales'''
+    '''se tomara al usuario que inicio sesion y se mostrara un menu con las opciones que puede realizar'''
 
     username = request.user.username
     return render(request, 'cuentas/menu_user.html', {
         'username': username,
     })
 
+
+
+
 class CrearCredencial(CreateView):
+    '''Validara que los datos proporcionados por el usuario en el formulario sean correctos y procedera a cifrarlos
+    utilizando un iv random, una llave aes a apartir de la password master la cual es la del usuario de inicio de
+    sesion  y lo guardara en la base de datos'''
     model = Credenciales
     form_class = CredentialForm
     template_name = 'cuentas/crear_cuenta.html'
@@ -203,8 +215,11 @@ class CrearCredencial(CreateView):
                 print(form.errors)
 
 
+
+@decorators.token_no_validado
 @login_required
 def CredencialesList(request):
+    '''Selecciona las credenciales que tiene el usuario y las muestra en lista'''
     model = Credenciales
     username = request.user.username
     user = User.objects.get(username=username)
@@ -217,8 +232,12 @@ def CredencialesList(request):
     return render(request, '../templates/cuentas/cuentas_list.html',
                   {'credenciales_list': credenciales_list})
 
+
+
 @login_required
 def CredencialDetailView(request, id):
+    '''Verifica que el usuario ingreso la passmaster y si es correcto , procede a descifrar los datos , utilizando
+    el iv almacenado, los datos cifrados y expandiendo  la contraseña creando una llave aes, mostrando los datos al usuario'''
     model = Credenciales
     form = PassmasterForm
     print('es es el id principal', id)
@@ -287,11 +306,91 @@ def CredencialDetailView(request, id):
             return render(request, 'cuentas/cuenta_detail_cp.html', context)
 
 
-class EditarCredenciales(UpdateView):
-    pass
+
+
+@login_required
+def CredencialUpdate(request, id):
+    '''Valida que los datos ingresados del usuario son correctos  y que la passmaster sea correcta,
+    toma los datos, crea un iv random, expande la passmaster creando una llave aes, cifra los datos
+    y los guarda en la base de datos '''
+    model = Credenciales
+    elemento = Credenciales.objects.get(id=id)  # toma los datos del objeto es decir los datos de la colunna
+    print('la primera impresion de elemento', elemento)
+    form = CredentialForm
+
+    print('es es el id principal', id)
+
+    username = request.user.username
+    user = User.objects.get(username=username)
+    id_user = request.user.id
+    if elemento.user_id != id_user:
+        print('no esta asociado a esta credencial')
+        return redirect('listar')
+    else:
+        if request.method == 'POST':
+
+            print('si es credencial del usuario')
+            credencial = Credenciales.objects.get(pk=id)
+            form = CredentialForm(request.POST, instance=credencial)
+            if form.is_valid():
+                passmaster = request.POST['pwd']
+                #passmast = request.POST.get('passmaster')
+                print('esta es la passmaster tomada', passmaster)
+                print('verificacion usuario tal', user)
+                if not check_password(passmaster, user.password):
+                    errores = 'La contraseña o passmaster es incorrecta.'
+                    context = {
+                        'errores': errores,
+                        'credencial': elemento,
+                        'form': form,
+                    }
+                    print('La contraseña o passmaster es incorrecta')
+                    return render(request, 'cuentas/editar_cuenta.html', context)
+
+                else:
+                    credencial = form.save()
+                    credencial.user = user
+                    iv = utils.generarIv()
+                    print('es el iv random', iv)
+                    llave_aes = utils.generar_llave_aes_from_password(passmaster)
+                    print('password plana cuenta', request.POST['pass_cifrado'])
+                    pwd_binario = (request.POST['pass_cifrado']).encode('ascii')
+                    print('la password binaria', pwd_binario)
+                    pwd_cifrada = utils.cifrarDatos(pwd_binario, iv, llave_aes)
+                    print(pwd_cifrada)
+                    print('usuario no cifrado', request.POST['user_cifrado'])
+                    user_binario = (request.POST['user_cifrado']).encode('ascii')
+                    print(('usuario en binario', user_binario))
+                    user_cifrada = utils.cifrarDatos(user_binario, iv, llave_aes)
+                    print('usuario cifrado', user_cifrada)
+                    user_notas = request.POST['notas']
+                    print('notas guardadas', user_notas)
+                    credencial.pass_cifradoo = pwd_cifrada
+                    credencial.user_cifradoo = user_cifrada
+                    iv_plano = base64.b64encode(iv)
+                    print('iv plano', iv_plano)
+                    credencial.iv = iv_plano
+                    credencial.notas = user_notas
+                    print('antes del save')
+                    form.save()
+                    print('se guardo')
+                    return redirect('listar')
+
+        else:
+            print(' el formulario no es valido')
+            context = {
+                'elemento': elemento,
+                'form': form,
+            }
+            return render(request, 'cuentas/editar_cuenta.html', context)
+
+
+
+
 
 @login_required
 def CredencialDelete(request, id):
+    '''Selecciona el id de la credencial  y procede a eliminarla'''
     model = Credenciales
     print(id)
 
@@ -306,8 +405,7 @@ def CredencialDelete(request, id):
     id_user = request.user.id
     print('el usuario iniciado es', id_user, 'el usuario en bd que tiene esta credencial', elemento.id)
 
-    #si el user_id que creo la credencial guardado en la base de d
-    #datos no es igual al que esta en este momento logeado
+
     if elemento.user_id != id_user:
         messages.error(request, 'no eres el autor de este post')
         return redirect('listar')

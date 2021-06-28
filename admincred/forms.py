@@ -67,7 +67,7 @@ class tokenForm(forms.ModelForm):
 
 class CredentialForm(forms.ModelForm):
     # MML verificacion de Contraseña
-    pwd = forms.CharField(label='Contraseña maestra', widget=forms.PasswordInput(
+    pwd = forms.CharField(label='Contraseña maestra: ', widget=forms.PasswordInput(
         attrs={
             'class': 'form-control',
             'placeholder': 'Ingrese de login',
@@ -75,14 +75,14 @@ class CredentialForm(forms.ModelForm):
             'required': 'required',
         }
     ))
-    user_cifrado = forms.CharField(label='usuario de la cuenta', widget=forms.TextInput(
+    user_cifrado = forms.CharField(label='Usuario de cuenta: ', widget=forms.TextInput(
         attrs={
-            'placeholder': 'ingrese el usuario de la cuenta',
+            'placeholder': 'Ingrese el usuario de la cuenta',
             'name': 'usuario_cuenta',
             'id': 'user_cifrado',
         }
     ))
-    pass_cifrado = forms.CharField(label='contraseña cuenta', widget=forms.PasswordInput(
+    pass_cifrado = forms.CharField(label='Contraseña  de cuenta: ', widget=forms.PasswordInput(
         attrs={
             'placeholder': 'Ingrese su contrasena de cuenta',
             'name': 'passcuenta',
@@ -105,15 +105,15 @@ class CredentialForm(forms.ModelForm):
                 attrs={
                     'placeholder': 'Nombre del sitio o cuenta',
                     'name': 'cuenta',
-                    'id': 'cuenta'
+                    'id': 'cuenta',
 
                 }
             ),
             'notas': forms.TextInput(
                 attrs={
-                    'placeholder':' ingrese notas de la credencial',
+                    'placeholder': ' Ingrese notas de la credencial',
                     'name': 'notas',
-                    'id': 'notas'
+                    'id': 'notas',
 
                 }
             )

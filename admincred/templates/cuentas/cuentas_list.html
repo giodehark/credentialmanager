@@ -7,7 +7,7 @@
     <ul>
       {% for credencial in credenciales_list %}
       <li>
-          <h4>{{ credencial.id }} - <a href="{{ credencial.get_absolute_url  }}"> {{ credencial.cuenta }}</a>
+          <h4> <a href="{{ credencial.get_absolute_url  }}"> {{ credencial.cuenta }}</a>
               {{ credencial.user }} </h4>
           <h5>{{ credencial.notas }}</h5>
       </li>
